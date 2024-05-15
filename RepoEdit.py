@@ -58,7 +58,3 @@ for repo in g.get_user().get_repos(type="owner"):
                 print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
         except Exception as e:
             print(f"An error occurred while processing {file.name}: {e}")
-        else:
-            print("No .github directory found in the repository")
-    except Exception as e:
-        print(f"An error occurred while processing the repository: {e}")
