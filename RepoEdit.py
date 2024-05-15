@@ -8,9 +8,9 @@ ACCESS_TOKEN = os.getenv('BULK_TOKEN')
 # Initialize the GitHub instance
 g = Github(ACCESS_TOKEN)
 
-try:
-    # Get the repository
-    repo = g.get_repo("Repo2")
+# Iterate through all repositories owned by the user
+for repo in g.get_user().get_repos(type="owner"):
+    print(repo.name)
 
     # Fetch all content from the repo's root directory
     repo_contents = repo.get_contents("")
@@ -28,12 +28,10 @@ try:
                 new_file_content = file_content.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
 
                 # Commit the updated file content
-                repo.update_file(file.path, f"Replace {STR_TO_REPLACE} with {REPLACEMENT_STRING}", new_file_content, file.sha)
+                repo.update_file(file.path, f"Replace {STR_TO_REPLACE} with {REPLACEMENT_STRING}", new_file_content,
+                                 file.sha)
                 print(f"Replaced in {file.name}")
             else:
                 print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
         except Exception as e:
             print(f"An error occurred while processing {file.name}: {e}")
-
-except Exception as ex:
-    print(f"An error occurred: {ex}")
