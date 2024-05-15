@@ -14,7 +14,7 @@ for repo in g.get_user().get_repos(type="owner"):
     print(f"Processing repository: {repo.name}")
 
     # Check if the repository has a deploy.yaml file
-    deploy_yaml_path = "deploy.yaml"
+    deploy_yaml_path = "Deploy.yml"
     deploy_yaml_file = None
     try:
         deploy_yaml_file = repo.get_contents(deploy_yaml_path)
