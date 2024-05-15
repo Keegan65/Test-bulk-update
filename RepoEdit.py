@@ -1,8 +1,8 @@
 from github import Github
 import os
 
-STR_TO_REPLACE = "abcdefghijk"
-REPLACEMENT_STRING = "deleted"
+STR_TO_REPLACE = "this one officer"
+REPLACEMENT_STRING = "arrested"
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 
 # Initialize the GitHub instance
