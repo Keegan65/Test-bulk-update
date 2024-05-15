@@ -1,5 +1,6 @@
 from github import Github
 import os
+import yaml
 
 STR_TO_REPLACE = "this one officer"
 REPLACEMENT_STRING = "arrested"
