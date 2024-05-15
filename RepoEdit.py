@@ -10,7 +10,7 @@ g = Github(ACCESS_TOKEN)
 
 try:
     # Get the repository
-    repo = g.get_repo('Repo1')
+    repo = g.get_repo("Repo2")
 
     # Fetch all content from the repo's root directory
     repo_contents = repo.get_contents("")
