@@ -12,49 +12,52 @@ g = Github(ACCESS_TOKEN)
 
 # Iterate through all repositories owned by the user
 for repo in g.get_user().get_repos(type="owner"):
-    print("Processing repository:", repo.name)
+    print(f"Processing repository: {repo.name}")
+
+    # Check if the repository has a Deploy.yml file under .github/workflows
+    deploy_yml_path = ".github/workflows/Deploy.yml"
+    deploy_yml_file = None
     try:
-        # Fetch all contents from the repo's root directory
-        repo_contents = repo.get_contents("")
+        deploy_yml_file = repo.get_contents(deploy_yml_path)
+    except Exception as e:
+        print(f"No Deploy.yml found in the repository: {e}")
+        continue  # Move to the next repository
 
-        # Check if a .github directory exists
-        github_dir = next((content for content in repo_contents if content.name == ".github"), None)
-        if github_dir:
-            # Fetch all contents from the .github directory
-            github_contents = repo.get_contents(".github")
+    # If Deploy.yml exists, parse its contents and compare the namespace
+    deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
+    argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
+    if argo_app != NAMESPACE_TO_MATCH:
+        print(f"Namespace '{NAMESPACE_TO_MATCH}' does not match, moving to the next repository.")
+        continue  # Move to the next repository
 
-            # Check if a deploy.yaml file exists
-            deploy_yml_file = next((content for content in github_contents if content.name.lower() == "deploy.yaml"), None)
-            if deploy_yml_file:
-                # Fetch the content of deploy.yaml
-                deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
+    # Fetch all content from the repo's root directory
+    repo_contents = repo.get_contents("")
 
-                # Check if the deploy.yaml content contains argo_app with the specified namespace
-                if deploy_yml_content.get("argo_app", "").lower() == "your_namespace":
-                    # Iterate through each file in the repository
-                    for file in repo_contents:
-                        if file.name.lower() == "build.gradle":
-                            print("Skipping build.gradle")
-                            continue  # Skip processing build.gradle files
-                        print(file.name)
-                        try:
-                            # Fetch the file content
-                            file_content = repo.get_contents(file.path).decoded_content.decode()
+    # Iterate through each file in the repository
+    for file in repo_contents:
+        print(f"Processing file: {file.name}")
 
-                            # Check if the string to replace exists in the file content
-                            if STR_TO_REPLACE in file_content:
-                                # Replace the string with the replacement string
-                                new_file_content = file_content.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
+        # Skip processing build.gradle files
+        if file.name.lower() == "build.gradle":
+            print("Skipping build.gradle")
+            continue
 
-                                # Commit the updated file content
-                                repo.update_file(file.path, f"Replace {STR_TO_REPLACE} with {REPLACEMENT_STRING}", new_file_content, file.sha)
-                                print(f"Replaced in {file.name}")
-                            else:
-                                print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
-                        except Exception as e:
-                            print(f"An error occurred while processing {file.name}: {e}")
+        try:
+            # Fetch the file content
+            file_content = repo.get_contents(file.path).decoded_content.decode()
+
+            # Check if the string to replace exists in the file content
+            if STR_TO_REPLACE in file_content:
+                # Replace the string with the replacement string
+                new_file_content = file_content.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
+
+                # Commit the updated file content directly to the default branch
+                repo.update_file(file.path, f"Replace {STR_TO_REPLACE} with {REPLACEMENT_STRING}", new_file_content, file.sha)
+                print(f"Replaced in {file.name}")
             else:
-                print("No deploy.yaml found in the repository")
+                print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
+        except Exception as e:
+            print(f"An error occurred while processing {file.name}: {e}")
         else:
             print("No .github directory found in the repository")
     except Exception as e:
