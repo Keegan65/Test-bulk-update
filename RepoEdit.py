@@ -3,7 +3,7 @@ import os
 
 STR_TO_REPLACE = "abcdefghijk"
 REPLACEMENT_STRING = "deleted"
-ACCESS_TOKEN = os.getenv('BULK_TOKEN')
+ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 
 # Initialize the GitHub instance
 g = Github(ACCESS_TOKEN)
