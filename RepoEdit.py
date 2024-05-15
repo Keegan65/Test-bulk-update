@@ -9,7 +9,7 @@ ACCESS_TOKEN = os.getenv('BULK_TOKEN')
 g = Github(ACCESS_TOKEN)
 
 # Get the repository
-repo = g.get_repo('MagBot')
+repo = g.get_repo('Repo1')
 
 # Fetch all content from the repo's root directory
 repo_contents = repo.get_contents("")
