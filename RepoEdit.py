@@ -1,7 +1,7 @@
 from github import Github
 import os
 
-STR_TO_REPLACE = "deleted"
+STR_TO_REPLACE = "abcdefghijk"
 REPLACEMENT_STRING = "deleted"
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 
