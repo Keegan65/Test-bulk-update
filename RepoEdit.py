@@ -8,14 +8,15 @@ NAMESPACE_TO_MATCH = "finance"  # Update with your namespace
 
 # Initialize the GitHub instance
 # Initialize the GitHub instance
+# Initialize the GitHub instance
 g = Github(ACCESS_TOKEN)
 
 # Iterate through all repositories owned by the user
 for repo in g.get_user().get_repos(type="owner"):
     print(f"Processing repository: {repo.name}")
 
-    # Check if the repository has a Deploy.yml file
-    deploy_yml_path = "Deploy.yml"
+    # Check if the repository has a Deploy.yml file under .github/workflows
+    deploy_yml_path = ".github/workflows/Deploy.yml"
     deploy_yml_file = None
     try:
         deploy_yml_file = repo.get_contents(deploy_yml_path)
