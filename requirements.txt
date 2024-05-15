@@ -1,4 +1,3 @@
 PyGithub==1.55
 requests==2.31.0
-# Use pre-built wheel file for PyYAML
-https://download.lfd.uci.edu/pythonlibs/y2rycu7g/PyYAML-6.0-cp39-cp39-win_amd64.whl
+
