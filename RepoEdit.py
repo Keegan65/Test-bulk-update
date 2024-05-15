@@ -7,24 +7,25 @@ ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 NAMESPACE_TO_MATCH = "finance"  # Update with your namespace
 
 # Initialize the GitHub instance
+# Initialize the GitHub instance
 g = Github(ACCESS_TOKEN)
 
 # Iterate through all repositories owned by the user
 for repo in g.get_user().get_repos(type="owner"):
     print(f"Processing repository: {repo.name}")
 
-    # Check if the repository has a deploy.yaml file
-    deploy_yaml_path = "Deploy.yml"
-    deploy_yaml_file = None
+    # Check if the repository has a Deploy.yml file
+    deploy_yml_path = "Deploy.yml"
+    deploy_yml_file = None
     try:
-        deploy_yaml_file = repo.get_contents(deploy_yaml_path)
+        deploy_yml_file = repo.get_contents(deploy_yml_path)
     except Exception as e:
-        print(f"No deploy.yaml found in the repository: {e}")
+        print(f"No Deploy.yml found in the repository: {e}")
         continue  # Move to the next repository
 
-    # If deploy.yaml exists, parse its contents and compare the namespace
-    deploy_yaml_content = yaml.safe_load(deploy_yaml_file.decoded_content)
-    argo_app = deploy_yaml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
+    # If Deploy.yml exists, parse its contents and compare the namespace
+    deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
+    argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
     if argo_app != NAMESPACE_TO_MATCH:
         print(f"Namespace '{NAMESPACE_TO_MATCH}' does not match, moving to the next repository.")
         continue  # Move to the next repository
