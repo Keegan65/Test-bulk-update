@@ -4,7 +4,7 @@ import os
 STR_TO_REPLACE = "this one officer"
 REPLACEMENT_STRING = "arrested"
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
-NAMESPACE_TO_MATCH = "your_namespace_here"  # Update with your namespace
+NAMESPACE_TO_MATCH = "finance"  # Update with your namespace
 
 # Initialize the GitHub instance
 g = Github(ACCESS_TOKEN)
