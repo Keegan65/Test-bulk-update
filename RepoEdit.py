@@ -86,8 +86,12 @@ def main():
             process_repository(repo, excluded_repos, namespace_to_match, repos_to_change, file_exclusions, str_to_replace, replacement_string, change_repo_name)
     else:
         for repo_name in repos_to_change:
+            print(f"Processing repository: {repo_name}")  # Debug statement
             repo = g.get_user().get_repo(repo_name)
-            process_repository(repo, excluded_repos, namespace_to_match, repos_to_change, file_exclusions, str_to_replace, replacement_string, change_repo_name)
+            if repo is None:
+                print(f"Repository '{repo_name}' not found.")
+            else:
+                process_repository(repo, excluded_repos, namespace_to_match, repos_to_change, file_exclusions, str_to_replace, replacement_string, change_repo_name)
 
 if __name__ == "__main__":
     main()
