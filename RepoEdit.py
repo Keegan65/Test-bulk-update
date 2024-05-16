@@ -2,7 +2,7 @@ from github import Github
 import os
 import yaml
 
-def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, change_repo_name):
+def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, change_repo_name, file_exclusions):
     print(f"Processing repository: {repo.name}")
 
     if repo.name in excluded_repos:
@@ -12,10 +12,7 @@ def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace,
     if not check_namespace(repo, namespace_to_match):
         return
 
-    print("Fetching repository contents...")
     repo_contents = repo.get_contents("")
-    print("Fetched repository contents.")
-
     deploy_yml_file = get_deploy_yml_file(repo)
 
     for file in repo_contents:
@@ -23,14 +20,11 @@ def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace,
             print(f"Skipping {file.name} as it's in the exclusions list.")
             continue
 
-        print(f"Processing file: {file.name}")
         process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string, change_repo_name)
 
 
 def check_namespace(repo, namespace_to_match):
-    print("Checking namespace...")
     if not namespace_to_match:
-        print("No namespaces to match. Proceeding...")
         return True
 
     deploy_yml_content = get_deploy_yml_content(repo)
@@ -44,7 +38,6 @@ def check_namespace(repo, namespace_to_match):
         return False
 
 def get_deploy_yml_file(repo):
-    print("Fetching deploy YAML file...")
     deploy_yml_path = ".github/workflows/Deploy.yml"
     try:
         return repo.get_contents(deploy_yml_path)
@@ -53,7 +46,6 @@ def get_deploy_yml_file(repo):
         return None
 
 def get_deploy_yml_content(repo):
-    print("Fetching deploy YAML content...")
     deploy_yml_file = get_deploy_yml_file(repo)
     if deploy_yml_file:
         return yaml.safe_load(deploy_yml_file.decoded_content)
@@ -64,26 +56,16 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
     print(f"Processing file: {file.name}")
     print(f"Change repo name: {change_repo_name}")  # Debugging statement
     try:
-        print("Fetching file content...")
         file_content = repo.get_contents(file.path).decoded_content.decode()
-        print("Fetched file content.")
-
-        print(f"File content: {file_content}")  # Debugging statement
-
         if str_to_replace in file_content:
-            print(f"String {str_to_replace} found in file content.")
             new_file_content = file_content.replace(str_to_replace, replacement_string)
-            print("Updated file content.")
-
-            print("Updating file...")
             repo.update_file(file.path, f"Replace {str_to_replace} with {replacement_string}", new_file_content, file.sha)
-            print(f"File {file.name} updated.")
+            print(f"Replaced in {file.name}")
 
             if change_repo_name:
                 print(f"Repo name before change: {repo.name}")  # Debugging statement
                 if str_to_replace in repo.name:
                     new_repo_name = repo.name.replace(str_to_replace, replacement_string)
-                    print(f"Changing repository name to: {new_repo_name}")  # Debugging statement
                     repo.edit(name=new_repo_name)
                     print(f"Repository name changed to: {new_repo_name}")
         else:
@@ -92,17 +74,18 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
         print(f"An error occurred while processing {file.name}: {e}")
 
 def main():
-    str_to_replace = os.environ.get('STR_TO_REPLACE')
-    replacement_string = os.environ.get('REPLACEMENT_STRING')
+    str_to_replace = os.getenv('STR_TO_REPLACE', '-this-one-officer')
+    replacement_string = os.getenv('REPLACEMENT_STRING', 'arrested')
     excluded_repos = os.environ.get('EXCLUDED_REPOS', '').split(',')
     namespace_to_match = os.environ.get('NAME_SPACE', '').split(',')
     file_exclusions = os.environ.get('FILE_EXCLUSIONS', '').split(',')
-    access_token = os.environ.get('GITHUB_TOKEN')
+    change_repo_name = os.getenv('CHANGE_REPO_NAME', 'false').lower() == 'true'
+    access_token = os.getenv('GITHUB_TOKEN')
 
     g = Github(access_token)
 
     for repo in g.get_user().get_repos(type="owner"):
-        process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, True)  # Pass True for change_repo_name
+        process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, change_repo_name, file_exclusions)
 
 if __name__ == "__main__":
     main()
