@@ -27,8 +27,8 @@ def check_namespace(repo, namespace_to_match):
     print("Checking namespace...")
     if not namespace_to_match:
         print("No namespaces to match. Proceeding...")
-        return True
-
+        return True  # Return True if no namespace is specified
+    
     deploy_yml_content = get_deploy_yml_content(repo)
     if deploy_yml_content:
         argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
