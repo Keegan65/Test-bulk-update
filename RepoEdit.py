@@ -73,10 +73,11 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
             repo.update_file(file.path, f"Replace {str_to_replace} with {replacement_string}", new_file_content, file.sha)
             print(f"Replaced in {file.name}")
 
-            if change_repo_name and str_to_replace in repo.name:
-                new_repo_name = repo.name.replace(str_to_replace, replacement_string)
-                repo.edit(name=new_repo_name)
-                print(f"Repository name changed to: {new_repo_name}")
+            if change_repo_name:
+                if str_to_replace in repo.name:
+                    new_repo_name = repo.name.replace(str_to_replace, replacement_string)
+                    repo.edit(name=new_repo_name)
+                    print(f"Repository name changed to: {new_repo_name}")
         else:
             print(f"The string {str_to_replace} is not found in {file.name}")
     except Exception as e:
