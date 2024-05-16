@@ -45,39 +45,42 @@ for repo in g.get_user().get_repos(type="owner"):
             print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
             continue  # Move to the next repository
 
-    # Process only specific repositories if provided
-    if REPOS_TO_CHANGE and repo.name not in REPOS_TO_CHANGE:
+   # Process only specific repositories if provided
+if REPOS_TO_CHANGE:
+    if repo.name not in REPOS_TO_CHANGE:
         print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
         continue
+else:
+    print("No specific repositories provided, processing all repositories.")
 
-    # Iterate through each file in the repository
-    for file in repo_contents:
-        print(f"Processing file: {file.name}")
+# Iterate through each file in the repository
+for file in repo_contents:
+    print(f"Processing file: {file.name}")
 
-        # Skip processing excluded files
-        if file.name in FILE_EXCLUSIONS:
-            print(f"Skipping {file.name} as it's in the exclusions list.")
-            continue
+    # Skip processing excluded files
+    if file.name in FILE_EXCLUSIONS:
+        print(f"Skipping {file.name} as it's in the exclusions list.")
+        continue
 
-        try:
-            # Fetch the file content
-            file_content = repo.get_contents(file.path).decoded_content.decode()
+    try:
+        # Fetch the file content
+        file_content = repo.get_contents(file.path).decoded_content.decode()
 
-            # Check if the string to replace exists in the file content
-            if STR_TO_REPLACE in file_content:
-                # Replace the string with the replacement string
-                new_file_content = file_content.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
+        # Check if the string to replace exists in the file content
+        if STR_TO_REPLACE in file_content:
+            # Replace the string with the replacement string
+            new_file_content = file_content.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
 
-                # Commit the updated file content directly to the default branch
-                repo.update_file(file.path, f"Replace {STR_TO_REPLACE} with {REPLACEMENT_STRING}", new_file_content, file.sha)
-                print(f"Replaced in {file.name}")
+            # Commit the updated file content directly to the default branch
+            repo.update_file(file.path, f"Replace {STR_TO_REPLACE} with {REPLACEMENT_STRING}", new_file_content, file.sha)
+            print(f"Replaced in {file.name}")
 
-                # Change repository name if specified
-                if CHANGE_REPO_NAME and STR_TO_REPLACE in repo.name:
-                    new_repo_name = repo.name.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
-                    repo.edit(name=new_repo_name)
-                    print(f"Repository name changed to: {new_repo_name}")
-            else:
-                print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
-        except Exception as e:
-            print(f"An error occurred while processing {file.name}: {e}")
+            # Change repository name if specified
+            if CHANGE_REPO_NAME and STR_TO_REPLACE in repo.name:
+                new_repo_name = repo.name.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
+                repo.edit(name=new_repo_name)
+                print(f"Repository name changed to: {new_repo_name}")
+        else:
+            print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
+    except Exception as e:
+        print(f"An error occurred while processing {file.name}: {e}")
