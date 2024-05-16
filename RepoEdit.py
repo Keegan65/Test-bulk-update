@@ -79,7 +79,7 @@ for repo in g.get_user().get_repos(type="owner"):
                 print(f"Replaced in {file.name}")
 
                 # Change repository name if specified
-                    if CHANGE_REPO_NAME:
+                if CHANGE_REPO_NAME:
                     print(f"CHANGE_REPO_NAME: {CHANGE_REPO_NAME}")
                     print(f"STR_TO_REPLACE: {STR_TO_REPLACE}")
                     print(f"Repo name: {repo.name}")
