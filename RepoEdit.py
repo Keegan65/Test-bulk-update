@@ -88,10 +88,10 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
         print(f"An error occurred while processing {file.name}: {e}")
 
 def main():
-    str_to_replace = os.getenv('STR_TO_REPLACE', '-this-one-officer')
-    replacement_string = os.getenv('REPLACEMENT_STRING', 'arrested')
-    repos_to_change = os.environ.get('REPOS_TO_CHANGE', '').split(',')
-    excluded_repos = os.environ.get('EXCLUDED_REPOS', '').split(',')
+    str_to_replace = os.getenv('STR_TO_REPLACE')
+    replacement_string = os.getenv('REPLACEMENT_STRING')
+    repos_to_change = os.environ.get('REPOS_TO_CHANGE').split(',')
+    excluded_repos = os.environ.get('EXCLUDED_REPOS').split(',')
     namespace_to_match = os.environ.get('NAME_SPACE').split(',')
     file_exclusions = os.environ.get('FILE_EXCLUSIONS', '').split(',')
     change_repo_name = os.getenv('CHANGE_REPO_NAME').lower() == 'true'
