@@ -2,101 +2,82 @@ from github import Github
 import os
 import yaml
 
+# Get inputs from environment variables
+STR_TO_REPLACE = os.getenv('STR_TO_REPLACE', '-this-one-officer')
+REPLACEMENT_STRING = os.getenv('REPLACEMENT_STRING', 'arrested')
+REPOS_TO_CHANGE = os.environ.get('REPOS_TO_CHANGE', '').split(',')
+EXCLUDED_REPOS = os.environ.get('EXCLUDED_REPOS', '').split(',')
+NAMESPACE_TO_MATCH = os.environ.get('NAME_SPACE', '').split(',')
+FILE_EXCLUSIONS = os.environ.get('FILE_EXCLUSIONS', '').split(',')
+CHANGE_REPO_NAME = os.getenv('CHANGE_REPO_NAME', 'false').lower() == 'false'
+ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 
-def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, change_repo_name):
+# Initialize the GitHub instance
+g = Github(ACCESS_TOKEN)
+
+# Iterate through all repositories owned by the user
+for repo in g.get_user().get_repos(type="owner"):
     print(f"Processing repository: {repo.name}")
 
-    if repo.name in excluded_repos:
+    # Check if the repository should be excluded
+    if repo.name in EXCLUDED_REPOS:
         print(f"Skipping repository: {repo.name} as it's excluded.")
-        return
+        continue
 
-    if namespace_to_match and not check_namespace(repo, namespace_to_match):
-        return  # Skip if namespace doesn't match or if namespace_to_match is empty
-
+    # Fetch all content from the repo's root directory
     repo_contents = repo.get_contents("")
-    deploy_yml_file = get_deploy_yml_file(repo)
 
+    # Check if the repository has a Deploy.yml file under .github/workflows
+    deploy_yml_path = ".github/workflows/Deploy.yml"
+    deploy_yml_file = None
+    try:
+        deploy_yml_file = repo.get_contents(deploy_yml_path)
+    except Exception as e:
+        print(f"No Deploy.yml found in the repository: {e}")
+        continue  # Move to the next repository
+
+    # If namespaces are provided, check if the repository matches any of them
+    if NAMESPACE_TO_MATCH:
+        # If Deploy.yml exists, parse its contents and compare the namespace
+        deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
+        argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
+        if argo_app not in NAMESPACE_TO_MATCH:
+            print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
+            continue  # Move to the next repository
+
+    # Process only specific repositories if provided
+    if REPOS_TO_CHANGE and repo.name not in REPOS_TO_CHANGE:
+        print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
+        continue
+
+    # Iterate through each file in the repository
     for file in repo_contents:
-        print(f"Scanning file: {file.name}")  # Debugging statement
-        if file.name in file_exclusions:
+        print(f"Processing file: {file.name}")
+
+        # Skip processing excluded files
+        if file.name in FILE_EXCLUSIONS:
             print(f"Skipping {file.name} as it's in the exclusions list.")
             continue
 
-        process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string, change_repo_name)
+        try:
+            # Fetch the file content
+            file_content = repo.get_contents(file.path).decoded_content.decode()
 
-def check_namespace(repo, namespace_to_match):
-    print("Checking namespace...")
-    if not namespace_to_match:
-        print("No namespaces to match. Proceeding...")
-        return True  # Return True if no namespace is specified
-    
-    deploy_yml_content = get_deploy_yml_content(repo)
-    if deploy_yml_content:
-        argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
-        if argo_app not in namespace_to_match:
-            print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
-            return False
-    else:
-        print("No deploy YAML content found. Moving to the next repository.")
-        return False
+            # Check if the string to replace exists in the file content
+            if STR_TO_REPLACE in file_content:
+                # Replace the string with the replacement string
+                new_file_content = file_content.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
 
-def get_deploy_yml_file(repo):
-    print("Fetching deploy YAML file...")
-    deploy_yml_path = ".github/workflows/Deploy.yml"
-    try:
-        return repo.get_contents(deploy_yml_path)
-    except Exception as e:
-        print(f"No Deploy.yml found in the repository: {e}")
-        return None
+                # Commit the updated file content directly to the default branch
+                repo.update_file(file.path, f"Replace {STR_TO_REPLACE} with {REPLACEMENT_STRING}", new_file_content, file.sha)
+                print(f"Replaced in {file.name}")
 
-def get_deploy_yml_content(repo):
-    print("Fetching deploy YAML content...")
-    deploy_yml_file = get_deploy_yml_file(repo)
-    if deploy_yml_file:
-        return yaml.safe_load(deploy_yml_file.decoded_content)
-    else:
-        return {}
-
-def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string, change_repo_name):
-    print(f"Processing file: {file.name}")
-    print(f"Change repo name: {change_repo_name}")  # Debugging statement
-    try:
-        file_content = repo.get_contents(file.path).decoded_content.decode()
-        print(f"Content of {file.name}: {file_content}")  # Debugging statement
-        print(f"String to replace: {str_to_replace}")  # Debugging statement
-        if str_to_replace in file_content:
-            print(f"String '{str_to_replace}' found in {file.name}. Replacing...")
-            new_file_content = file_content.replace(str_to_replace, replacement_string)
-            print(f"New content of {file.name}: {new_file_content}")  # Debugging statement
-            repo.update_file(file.path, f"Replace {str_to_replace} with {replacement_string}", new_file_content, file.sha)
-            print(f"Replaced in {file.name}")
-
-            if change_repo_name:
-                print(f"Repo name before change: {repo.name}")  # Debugging statement
-                if str_to_replace in repo.name:
-                    print(f"Changing repository name...")
-                    new_repo_name = repo.name.replace(str_to_replace, replacement_string)
+                # Change repository name if specified
+                if CHANGE_REPO_NAME and STR_TO_REPLACE in repo.name:
+                    new_repo_name = repo.name.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
                     repo.edit(name=new_repo_name)
                     print(f"Repository name changed to: {new_repo_name}")
-                else:
-                    print(f"String {str_to_replace} not found in repository name: {repo.name}")
-        else:
-            print(f"The string {str_to_replace} is not found in {file.name}")
-    except Exception as e:
-        print(f"An error occurred while processing {file.name}: {e}")
-
-def main():
-    str_to_replace = os.getenv('STR_TO_REPLACE', '-this-one-officer')
-    replacement_string = os.getenv('REPLACEMENT_STRING', 'arrested')
-    excluded_repos = os.getenv('EXCLUDED_REPOS', '').split(',')
-    namespace_to_match = os.getenv('NAME_SPACE', '').split(',')
-    file_exclusions = os.getenv('FILE_EXCLUSIONS', '').split(',')
-    access_token = os.getenv('GITHUB_TOKEN')
-
-    g = Github(access_token)
-
-    for repo in g.get_user().get_repos(type="owner"):
-        process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, True)  # Pass True for change_repo_name
-
-if __name__ == "__main__":
-    main()
+            else:
+                print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
+        except Exception as e:
+            print(f"An error occurred while processing {file.name}: {e}")
