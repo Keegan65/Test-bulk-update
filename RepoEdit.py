@@ -23,7 +23,9 @@ def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace,
         process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string, change_repo_name)
 
 def check_namespace(repo, namespace_to_match):
+    print("Checking namespace...")
     if not namespace_to_match:
+        print("No namespaces to match. Proceeding...")
         return True
 
     deploy_yml_content = get_deploy_yml_content(repo)
@@ -37,6 +39,7 @@ def check_namespace(repo, namespace_to_match):
         return False
 
 def get_deploy_yml_file(repo):
+    print("Fetching deploy YAML file...")
     deploy_yml_path = ".github/workflows/Deploy.yml"
     try:
         return repo.get_contents(deploy_yml_path)
@@ -45,6 +48,7 @@ def get_deploy_yml_file(repo):
         return None
 
 def get_deploy_yml_content(repo):
+    print("Fetching deploy YAML content...")
     deploy_yml_file = get_deploy_yml_file(repo)
     if deploy_yml_file:
         return yaml.safe_load(deploy_yml_file.decoded_content)
@@ -57,6 +61,7 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
     try:
         file_content = repo.get_contents(file.path).decoded_content.decode()
         if str_to_replace in file_content:
+            print(f"String '{str_to_replace}' found in {file.name}. Replacing...")
             new_file_content = file_content.replace(str_to_replace, replacement_string)
             repo.update_file(file.path, f"Replace {str_to_replace} with {replacement_string}", new_file_content, file.sha)
             print(f"Replaced in {file.name}")
@@ -64,6 +69,7 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
             if change_repo_name:
                 print(f"Repo name before change: {repo.name}")  # Debugging statement
                 if str_to_replace in repo.name:
+                    print(f"Changing repository name...")
                     new_repo_name = repo.name.replace(str_to_replace, replacement_string)
                     repo.edit(name=new_repo_name)
                     print(f"Repository name changed to: {new_repo_name}")
