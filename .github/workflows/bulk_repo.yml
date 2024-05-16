@@ -18,7 +18,7 @@ on:
       EXCLUDED_REPOS:
         description: 'Repositories to exclude (comma-separated)'
         required: false
-        default: ''
+        default: 'Repo2'
       NAME_SPACE:
         description: 'Namespace(s) (comma-separated)'
         required: false
