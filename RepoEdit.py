@@ -90,8 +90,7 @@ def main():
 
     g = Github(access_token)
 
-    for repo in g.get_user().get_repos(type="owner"):
-        process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, True)  # Pass True for change_repo_name
-
+    or repo in g.get_user().get_repos(type="owner"):
+    process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, True)  # Always call process_repository
 if __name__ == "__main__":
     main()
