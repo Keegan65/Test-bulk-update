@@ -60,9 +60,12 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
     print(f"Change repo name: {change_repo_name}")  # Debugging statement
     try:
         file_content = repo.get_contents(file.path).decoded_content.decode()
+        print(f"Content of {file.name}: {file_content}")  # Debugging statement
+        print(f"String to replace: {str_to_replace}")  # Debugging statement
         if str_to_replace in file_content:
             print(f"String '{str_to_replace}' found in {file.name}. Replacing...")
             new_file_content = file_content.replace(str_to_replace, replacement_string)
+            print(f"New content of {file.name}: {new_file_content}")  # Debugging statement
             repo.update_file(file.path, f"Replace {str_to_replace} with {replacement_string}", new_file_content, file.sha)
             print(f"Replaced in {file.name}")
 
