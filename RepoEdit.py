@@ -36,8 +36,6 @@ def check_namespace(repo, namespace_to_match):
         print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
         return False
 
-    return True
-
 def check_repos_to_change(repo, repos_to_change):
     if not repos_to_change:
         return True
@@ -47,8 +45,6 @@ def check_repos_to_change(repo, repos_to_change):
     else:
         print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
         return False
-
-    return True
 
 def get_deploy_yml_file(repo):
     deploy_yml_path = ".github/workflows/Deploy.yml"
