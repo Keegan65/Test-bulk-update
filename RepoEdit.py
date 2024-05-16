@@ -37,6 +37,7 @@ for repo in g.get_user().get_repos(type="owner"):
         continue  # Move to the next repository
 
     # If namespaces are provided, check if the repository matches any of them
+    deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
     if NAMESPACE_TO_MATCH and deploy_yml_content:
         # If Deploy.yml exists and namespaces are provided, parse its contents and compare the namespace
         deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
