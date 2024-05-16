@@ -91,8 +91,8 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
 
 
 def main():
-    str_to_replace = os.getenv('STR_TO_REPLACE', '-this-one-officer')
-    replacement_string = os.getenv('REPLACEMENT_STRING', 'arrested')
+    str_to_replace = os.getenv('STR_TO_REPLACE')
+    replacement_string = os.getenv('REPLACEMENT_STRING')
     repos_to_change = os.environ.get('REPOS_TO_CHANGE', '').split(',')
     excluded_repos = os.environ.get('EXCLUDED_REPOS', '').split(',')
     namespace_to_match = os.environ.get('NAME_SPACE', '').split(',')
