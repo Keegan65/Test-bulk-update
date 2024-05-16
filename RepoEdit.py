@@ -79,19 +79,22 @@ for repo in g.get_user().get_repos(type="owner"):
                 print(f"Replaced in {file.name}")
 
                 # Change repository name if specified
-                print(f"CHANGE_REPO_NAME: {CHANGE_REPO_NAME}")
-                print(f"STR_TO_REPLACE: {STR_TO_REPLACE}")
-                print(f"Repo name: {repo.name}")
-                if CHANGE_REPO_NAME and STR_TO_REPLACE in repo.name:
-                    print("Attempting to change repository name.")
-                    new_repo_name = repo.name.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
-                    try:
-                        repo.edit(name=new_repo_name)
-                        print(f"Repository name changed to: {new_repo_name}")
-                    except Exception as e:
-                        print(f"Error occurred while changing repository name: {e}")
+                if CHANGE_REPO_NAME:
+                    print(f"CHANGE_REPO_NAME: {CHANGE_REPO_NAME}")
+                    print(f"STR_TO_REPLACE: {STR_TO_REPLACE}")
+                    print(f"Repo name: {repo.name}")
+                    if STR_TO_REPLACE in repo.name:
+                        print("Attempting to change repository name.")
+                        new_repo_name = repo.name.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
+                        try:
+                            repo.edit(name=new_repo_name)
+                            print(f"Repository name changed to: {new_repo_name}")
+                        except Exception as e:
+                            print(f"Error occurred while changing repository name: {e}")
+                    else:
+                        print("Not attempting to change repository name")
                 else:
-                    print("Not attempting to change repository name")
+                    print("CHANGE_REPO_NAME is False, skipping repository name changes.")
             else:
                 print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
         except Exception as e:
