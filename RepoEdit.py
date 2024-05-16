@@ -7,7 +7,7 @@ STR_TO_REPLACE = os.getenv('STR_TO_REPLACE', '-this-one-officer')
 REPLACEMENT_STRING = os.getenv('REPLACEMENT_STRING', 'arrested')
 REPOS_TO_CHANGE = os.environ.get('REPOS_TO_CHANGE', '').split(',')
 EXCLUDED_REPOS = os.environ.get('EXCLUDED_REPOS', '').split(',')
-NAMESPACE_TO_MATCH = os.environ.get('NAME_SPACE', '').split(',')
+NAMESPACE_TO_MATCH = os.environ.get('NAME_SPACE').split(',')
 FILE_EXCLUSIONS = os.environ.get('FILE_EXCLUSIONS', '').split(',')
 CHANGE_REPO_NAME = os.getenv('CHANGE_REPO_NAME', 'false').lower() == 'false'
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
