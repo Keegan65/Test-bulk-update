@@ -9,7 +9,7 @@ REPOS_TO_CHANGE = os.getenv('REPOS_TO_CHANGE', '').split(',')
 EXCLUDED_REPOS = os.getenv('EXCLUDED_REPOS', '').split(',')
 NAMESPACE_TO_MATCH = os.getenv('NAME_SPACE').split(',')
 FILE_EXCLUSIONS = os.getenv('FILE_EXCLUSIONS', '').split(',')
-CHANGE_REPO_NAME = os.getenv('CHANGE_REPO_NAME')
+CHANGE_REPO_NAME = os.getenv('CHANGE_REPO_NAME').lower() == 'true'
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 
 # Initialize the GitHub instance
@@ -79,7 +79,7 @@ for repo in g.get_user().get_repos(type="owner"):
                 print(f"Replaced in {file.name}")
 
                 # Change repository name if specified
-                if CHANGE_REPO_NAME == 'true':
+                if CHANGE_REPO_NAME:
                     print(f"CHANGE_REPO_NAME: {CHANGE_REPO_NAME}")
                     print(f"STR_TO_REPLACE: {STR_TO_REPLACE}")
                     print(f"Repo name: {repo.name}")
