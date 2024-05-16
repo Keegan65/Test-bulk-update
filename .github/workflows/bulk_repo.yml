@@ -18,15 +18,15 @@ on:
       EXCLUDED_REPOS:
         description: 'Repositories to exclude (comma-separated)'
         required: false
-        default: 'Repo2'
+        default: ''
       NAME_SPACE:
         description: 'Namespace(s) (comma-separated)'
         required: false
-        default: 'finance'
+        default: ''
       FILE_EXCLUSIONS:
         description: 'Files to exclude (comma-separated)'
         required: false
-        default: 'build.gradle'
+        default: ''
       CHANGE_REPO_NAME:
         description: 'Change repository name (true/false)'
         required: true
