@@ -37,14 +37,15 @@ for repo in g.get_user().get_repos(type="owner"):
         continue  # Move to the next repository
 
     # If namespaces are provided, check if the repository matches any of them
-    if NAMESPACE_TO_MATCH:
-        # If Deploy.yml exists and namespaces are provided, parse its contents and compare the namespace
-        deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
-        argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
-        if argo_app not in NAMESPACE_TO_MATCH:
-            print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
-            continue  # Move to the next repository
-    elif not NAMESPACE_TO_MATCH:
+    deploy_yml_content = None
+    if NAMESPACE_TO_MATCH != ['']:  # Check if NAMESPACE_TO_MATCH is not an empty string
+        if deploy_yml_file:
+            deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
+            argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
+            if argo_app not in NAMESPACE_TO_MATCH:
+                print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
+                continue  # Move to the next repository
+    else:
         print("No namespaces provided, skipping namespace matching.")
         
 
