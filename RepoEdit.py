@@ -47,7 +47,6 @@ for repo in g.get_user().get_repos(type="owner"):
                 continue  # Move to the next repository
     else:
         print("No namespaces provided, skipping namespace matching.")
-        
 
     # Process only specific repositories if provided
     if REPOS_TO_CHANGE != ['']:  # Check if REPOS_TO_CHANGE is not an empty string
@@ -82,8 +81,11 @@ for repo in g.get_user().get_repos(type="owner"):
                 # Change repository name if specified
                 if CHANGE_REPO_NAME and STR_TO_REPLACE in repo.name:
                     new_repo_name = repo.name.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
-                    repo.edit(name=new_repo_name)
-                    print(f"Repository name changed to: {new_repo_name}")
+                    try:
+                        repo.edit(name=new_repo_name)
+                        print(f"Repository name changed to: {new_repo_name}")
+                    except Exception as e:
+                        print(f"Error occurred while changing repository name: {e}")
             else:
                 print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
         except Exception as e:
