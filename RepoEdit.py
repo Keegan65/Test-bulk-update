@@ -1,8 +1,3 @@
-
-Sure, we can refactor the second approach to have a structure similar to the first one, while keeping the modular functions for clarity and maintainability. Here's the refactored code:
-
-python
-Copy code
 from github import Github
 import os
 import yaml
