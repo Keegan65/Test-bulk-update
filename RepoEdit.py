@@ -2,7 +2,7 @@ from github import Github
 import os
 import yaml
 
-STR_TO_REPLACE = "this one officer"
+STR_TO_REPLACE = "-this-one-officer"
 REPLACEMENT_STRING = "arrested"
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 NAMESPACE_TO_MATCH = "finance"  # Update with your namespace
