@@ -64,22 +64,28 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
     print(f"Processing file: {file.name}")
     print(f"Change repo name: {change_repo_name}")  # Debugging statement
     try:
+        print("Fetching file content...")
         file_content = repo.get_contents(file.path).decoded_content.decode()
+        print("Fetched file content.")
+
+        print(f"File content: {file_content}")  # Debugging statement
+
         if str_to_replace in file_content:
-            print(f"String '{str_to_replace}' found in {file.name}. Replacing...")
+            print(f"String {str_to_replace} found in file content.")
             new_file_content = file_content.replace(str_to_replace, replacement_string)
+            print("Updated file content.")
+
+            print("Updating file...")
             repo.update_file(file.path, f"Replace {str_to_replace} with {replacement_string}", new_file_content, file.sha)
-            print(f"Replaced in {file.name}")
+            print(f"File {file.name} updated.")
 
             if change_repo_name:
                 print(f"Repo name before change: {repo.name}")  # Debugging statement
                 if str_to_replace in repo.name:
-                    print(f"Changing repository name...")
                     new_repo_name = repo.name.replace(str_to_replace, replacement_string)
+                    print(f"Changing repository name to: {new_repo_name}")  # Debugging statement
                     repo.edit(name=new_repo_name)
                     print(f"Repository name changed to: {new_repo_name}")
-                else:
-                    print(f"String {str_to_replace} not found in repository name: {repo.name}")
         else:
             print(f"The string {str_to_replace} is not found in {file.name}")
     except Exception as e:
