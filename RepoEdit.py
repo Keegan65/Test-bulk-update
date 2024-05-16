@@ -45,11 +45,11 @@ for repo in g.get_user().get_repos(type="owner"):
             print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
             continue  # Move to the next repository
 
-   # Process only specific repositories if provided
+# Process only specific repositories if provided
 if REPOS_TO_CHANGE:
     if repo.name not in REPOS_TO_CHANGE:
         print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
-        continue
+        continue  # This should continue within the loop
 else:
     print("No specific repositories provided, processing all repositories.")
 
