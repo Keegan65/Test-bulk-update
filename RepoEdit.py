@@ -12,7 +12,10 @@ def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace,
     if not check_namespace(repo, namespace_to_match):
         return
 
+    print("Fetching repository contents...")
     repo_contents = repo.get_contents("")
+    print("Fetched repository contents.")
+
     deploy_yml_file = get_deploy_yml_file(repo)
 
     for file in repo_contents:
@@ -20,7 +23,9 @@ def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace,
             print(f"Skipping {file.name} as it's in the exclusions list.")
             continue
 
+        print(f"Processing file: {file.name}")
         process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string, change_repo_name)
+
 
 def check_namespace(repo, namespace_to_match):
     print("Checking namespace...")
