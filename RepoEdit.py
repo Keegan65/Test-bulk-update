@@ -50,7 +50,7 @@ for repo in g.get_user().get_repos(type="owner"):
         
 
     # Process only specific repositories if provided
-    if REPOS_TO_CHANGE:
+    if REPOS_TO_CHANGE != ['']:  # Check if REPOS_TO_CHANGE is not an empty string
         if repo.name not in REPOS_TO_CHANGE:
             print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
             continue
