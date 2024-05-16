@@ -9,7 +9,7 @@ REPOS_TO_CHANGE = os.getenv('REPOS_TO_CHANGE', '').split(',')
 EXCLUDED_REPOS = os.getenv('EXCLUDED_REPOS', '').split(',')
 NAMESPACE_TO_MATCH = os.getenv('NAME_SPACE').split(',')
 FILE_EXCLUSIONS = os.getenv('FILE_EXCLUSIONS', '').split(',')
-CHANGE_REPO_NAME = os.getenv('CHANGE_REPO_NAME', 'false').lower() == 'false'
+CHANGE_REPO_NAME = os.getenv('CHANGE_REPO_NAME', 'false').lower() == 'true'
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 
 # Initialize the GitHub instance
