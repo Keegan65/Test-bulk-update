@@ -79,8 +79,7 @@ for repo in g.get_user().get_repos(type="owner"):
                 print(f"Replaced in {file.name}")
 
                 # Change repository name if specified
-                if CHANGE_REPO_NAME:
-                    print("CHANGE_REPO_NAME is True, skipping repository name changes.")
+                    if CHANGE_REPO_NAME:
                     print(f"CHANGE_REPO_NAME: {CHANGE_REPO_NAME}")
                     print(f"STR_TO_REPLACE: {STR_TO_REPLACE}")
                     print(f"Repo name: {repo.name}")
@@ -94,6 +93,8 @@ for repo in g.get_user().get_repos(type="owner"):
                             print(f"Error occurred while changing repository name: {e}")
                     else:
                         print("Not attempting to change repository name")
+                else:
+                    print("CHANGE_REPO_NAME is False, skipping repository name changes.")
                 else:
                     print("CHANGE_REPO_NAME is False, skipping repository name changes.")
             else:
