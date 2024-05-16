@@ -49,6 +49,8 @@ def check_repos_to_change(repo, repos_to_change):
         print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
         return False
 
+    return True
+
 def get_deploy_yml_file(repo):
     deploy_yml_path = ".github/workflows/Deploy.yml"
     try:
