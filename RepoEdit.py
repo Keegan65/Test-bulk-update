@@ -1,7 +1,6 @@
 from github import Github
 import os
 import yaml
-
 # Get inputs from environment variables
 STR_TO_REPLACE = os.getenv('STR_TO_REPLACE', '-this-one-officer')
 REPLACEMENT_STRING = os.getenv('REPLACEMENT_STRING', 'arrested')
@@ -11,22 +10,17 @@ NAMESPACE_TO_MATCH = os.getenv('NAME_SPACE').split(',')
 FILE_EXCLUSIONS = os.getenv('FILE_EXCLUSIONS', '').split(',')
 CHANGE_REPO_NAME = os.getenv('CHANGE_REPO_NAME').lower() == 'true'
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
-
 # Initialize the GitHub instance
 g = Github(ACCESS_TOKEN)
-
 # Iterate through all repositories owned by the user
 for repo in g.get_user().get_repos(type="owner"):
     print(f"Processing repository: {repo.name}")
-
     # Check if the repository should be excluded
     if repo.name in EXCLUDED_REPOS:
         print(f"Skipping repository: {repo.name} as it's excluded.")
         continue
-
     # Fetch all content from the repo's root directory
     repo_contents = repo.get_contents("")
-
     # Check if the repository has a Deploy.yml file under .github/workflows
     deploy_yml_path = ".github/workflows/Deploy.yml"
     deploy_yml_file = None
@@ -35,7 +29,6 @@ for repo in g.get_user().get_repos(type="owner"):
     except Exception as e:
         print(f"No Deploy.yml found in the repository: {e}")
         continue  # Move to the next repository
-
     # If namespaces are provided, check if the repository matches any of them
     deploy_yml_content = None
     if NAMESPACE_TO_MATCH != ['']:  # Check if NAMESPACE_TO_MATCH is not an empty string
@@ -47,7 +40,6 @@ for repo in g.get_user().get_repos(type="owner"):
                 continue  # Move to the next repository
     else:
         print("No namespaces provided, skipping namespace matching.")
-
     # Process only specific repositories if provided
     if REPOS_TO_CHANGE != ['']:  # Check if REPOS_TO_CHANGE is not an empty string
         if repo.name not in REPOS_TO_CHANGE:
@@ -55,25 +47,20 @@ for repo in g.get_user().get_repos(type="owner"):
             continue
     else:
         print("No specific repositories provided, processing all repositories.")
-
     # Iterate through each file in the repository
     for file in repo_contents:
         print(f"Processing file: {file.name}")
-
         # Skip processing excluded files
         if file.name in FILE_EXCLUSIONS:
             print(f"Skipping {file.name} as it's in the exclusions list.")
             continue
-
         try:
             # Fetch the file content
             file_content = repo.get_contents(file.path).decoded_content.decode()
-
             # Check if the string to replace exists in the file content
             if STR_TO_REPLACE in file_content:
                 # Replace the string with the replacement string
                 new_file_content = file_content.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
-
                 # Commit the updated file content directly to the default branch
                 repo.update_file(file.path, f"Replace {STR_TO_REPLACE} with {REPLACEMENT_STRING}", new_file_content, file.sha)
                 print(f"Replaced in {file.name}")
