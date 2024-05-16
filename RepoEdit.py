@@ -91,6 +91,7 @@ def main():
     g = Github(access_token)
 
     for repo in g.get_user().get_repos(type="owner"):
+        print(f"Processing repository: {repo.name}")  # Debugging statement
         process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, True)  # Pass True for change_repo_name
 
 if __name__ == "__main__":
