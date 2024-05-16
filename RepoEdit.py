@@ -54,6 +54,12 @@ for repo in g.get_user().get_repos(type="owner"):
                 # Commit the updated file content directly to the default branch
                 repo.update_file(file.path, f"Replace {STR_TO_REPLACE} with {REPLACEMENT_STRING}", new_file_content, file.sha)
                 print(f"Replaced in {file.name}")
+
+                # Check if the repository name contains the string to replace
+                if STR_TO_REPLACE in repo.name:
+                    new_repo_name = repo.name.replace(STR_TO_REPLACE, REPLACEMENT_STRING)
+                    repo.edit(name=new_repo_name)
+                    print(f"Repository name changed to: {new_repo_name}")
             else:
                 print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
         except Exception as e:
