@@ -12,6 +12,9 @@ def process_repository(repo, excluded_repos, namespace_to_match, repos_to_change
     if not check_namespace(repo, namespace_to_match):
         return
 
+    if not check_repos_to_change(repo, repos_to_change):
+        return
+
     repo_contents = repo.get_contents("")
     deploy_yml_file = get_deploy_yml_file(repo)
 
@@ -31,6 +34,16 @@ def check_namespace(repo, namespace_to_match):
     
     if argo_app not in namespace_to_match:
         print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
+        return False
+
+    return True
+
+def check_repos_to_change(repo, repos_to_change):
+    if not repos_to_change:
+        return True
+
+    if repo.name not in repos_to_change:
+        print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
         return False
 
     return True
@@ -80,18 +93,8 @@ def main():
 
     g = Github(access_token)
 
-    if not repos_to_change:
-        print("No repositories specified to change. Processing all repositories owned by the user.")
-        for repo in g.get_user().get_repos(type="owner"):
-            process_repository(repo, excluded_repos, namespace_to_match, repos_to_change, file_exclusions, str_to_replace, replacement_string, change_repo_name)
-    else:
-        for repo_name in repos_to_change:
-            print(f"Processing repository: {repo_name}")  # Debug statement
-            repo = g.get_user().get_repo(repo_name)
-            if repo is None:
-                print(f"Repository '{repo_name}' not found.")
-            else:
-                process_repository(repo, excluded_repos, namespace_to_match, repos_to_change, file_exclusions, str_to_replace, replacement_string, change_repo_name)
+    for repo in g.get_user().get_repos(type="owner"):
+        process_repository(repo, excluded_repos, namespace_to_match, repos_to_change, file_exclusions, str_to_replace, replacement_string, change_repo_name)
 
 if __name__ == "__main__":
     main()
