@@ -6,11 +6,11 @@ on:
       STR_TO_REPLACE:
         description: 'String to replace'
         required: true
-        default: '-this-one-officer'
+        default: 'o'
       REPLACEMENT_STRING:
         description: 'Replacement string'
         required: true
-        default: 'arrested'
+        default: 'b'
       REPOS_TO_CHANGE:
         description: 'Repositories to change (comma-separated)'
         required: false
