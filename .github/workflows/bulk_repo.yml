@@ -6,11 +6,11 @@ on:
       STR_TO_REPLACE:
         description: 'String to replace'
         required: true
-        default: '-this-one-officer'
+        default: 'o'
       REPLACEMENT_STRING:
         description: 'Replacement string'
         required: true
-        default: 'arrested'
+        default: 'b'
       REPOS_TO_CHANGE:
         description: 'Repositories to change (comma-separated)'
         required: false
@@ -22,15 +22,15 @@ on:
       NAME_SPACE:
         description: 'Namespace(s) (comma-separated)'
         required: false
-        default: 'finance'
+        default: ''
       FILE_EXCLUSIONS:
         description: 'Files to exclude (comma-separated)'
         required: false
-        default: 'build.gradle'
+        default: ''
       CHANGE_REPO_NAME:
         description: 'Change repository name (true/false)'
         required: true
-        default: 'false'
+        default: 'true'
 
 jobs:
   run_python_script:
