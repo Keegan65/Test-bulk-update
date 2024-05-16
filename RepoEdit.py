@@ -46,14 +46,14 @@ for repo in g.get_user().get_repos(type="owner"):
             continue  # Move to the next repository
 
     # Process only specific repositories if provided
-if not REPOS_TO_CHANGE:
-    # If REPOS_TO_CHANGE is empty, include all repositories
-    print("REPOS_TO_CHANGE is empty, processing all repositories.")
-else:
-    # Check if the current repository is in the specified list
-    if repo.name not in REPOS_TO_CHANGE:
-        print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
-        continue
+    if not REPOS_TO_CHANGE:
+        # If REPOS_TO_CHANGE is empty, include all repositories
+        print("REPOS_TO_CHANGE is empty, processing all repositories.")
+    else:
+        # Check if the current repository is in the specified list
+        if repo.name not in REPOS_TO_CHANGE:
+            print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
+            continue
 
     # Iterate through each file in the repository
     for file in repo_contents:
