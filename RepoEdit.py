@@ -2,6 +2,7 @@ from github import Github
 import os
 import yaml
 
+
 def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, change_repo_name):
     print(f"Processing repository: {repo.name}")
 
@@ -9,8 +10,8 @@ def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace,
         print(f"Skipping repository: {repo.name} as it's excluded.")
         return
 
-    if not check_namespace(repo, namespace_to_match):
-        return
+    if namespace_to_match and not check_namespace(repo, namespace_to_match):
+        return  # Skip if namespace doesn't match
 
     repo_contents = repo.get_contents("")
     deploy_yml_file = get_deploy_yml_file(repo)
