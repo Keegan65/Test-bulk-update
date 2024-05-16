@@ -95,8 +95,6 @@ for repo in g.get_user().get_repos(type="owner"):
                         print("Not attempting to change repository name")
                 else:
                     print("CHANGE_REPO_NAME is False, skipping repository name changes.")
-                else:
-                    print("CHANGE_REPO_NAME is False, skipping repository name changes.")
             else:
                 print(f"The string {STR_TO_REPLACE} is not found in {file.name}")
         except Exception as e:
