@@ -5,10 +5,10 @@ import yaml
 # Get inputs from environment variables
 STR_TO_REPLACE = os.getenv('STR_TO_REPLACE', '-this-one-officer')
 REPLACEMENT_STRING = os.getenv('REPLACEMENT_STRING', 'arrested')
-REPOS_TO_CHANGE = os.environ.get('REPOS_TO_CHANGE', '').split(',')
-EXCLUDED_REPOS = os.environ.get('EXCLUDED_REPOS', '').split(',')
-NAMESPACE_TO_MATCH = os.environ.get('NAME_SPACE').split(',')
-FILE_EXCLUSIONS = os.environ.get('FILE_EXCLUSIONS', '').split(',')
+REPOS_TO_CHANGE = os.getenv('REPOS_TO_CHANGE', '').split(',')
+EXCLUDED_REPOS = os.getenv('EXCLUDED_REPOS', '').split(',')
+NAMESPACE_TO_MATCH = os.getenv('NAME_SPACE').split(',')
+FILE_EXCLUSIONS = os.getenv('FILE_EXCLUSIONS', '').split(',')
 CHANGE_REPO_NAME = os.getenv('CHANGE_REPO_NAME', 'false').lower() == 'false'
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 
@@ -37,8 +37,7 @@ for repo in g.get_user().get_repos(type="owner"):
         continue  # Move to the next repository
 
     # If namespaces are provided, check if the repository matches any of them
-    deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
-    if NAMESPACE_TO_MATCH and deploy_yml_content:
+    if NAMESPACE_TO_MATCH:
         # If Deploy.yml exists and namespaces are provided, parse its contents and compare the namespace
         deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
         argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
@@ -47,6 +46,7 @@ for repo in g.get_user().get_repos(type="owner"):
             continue  # Move to the next repository
     elif not NAMESPACE_TO_MATCH:
         print("No namespaces provided, skipping namespace matching.")
+        
 
     # Process only specific repositories if provided
     if REPOS_TO_CHANGE:
