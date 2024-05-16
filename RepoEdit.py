@@ -84,7 +84,7 @@ def main():
     replacement_string = os.getenv('REPLACEMENT_STRING', 'arrested')
     repos_to_change = os.environ.get('REPOS_TO_CHANGE', '').split(',')
     excluded_repos = os.environ.get('EXCLUDED_REPOS', '').split(',')
-    namespace_to_match = os.environ.get('NAME_SPACE', '').split(',')
+    namespace_to_match = os.environ.get('NAME_SPACE').split(',')
     file_exclusions = os.environ.get('FILE_EXCLUSIONS', '').split(',')
     change_repo_name = os.getenv('CHANGE_REPO_NAME', 'true').lower() == 'true'
     access_token = os.getenv('GITHUB_TOKEN')
