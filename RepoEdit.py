@@ -84,12 +84,12 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
         print(f"An error occurred while processing {file.name}: {e}")
 
 def main():
-    str_to_replace = os.environ.get('STR_TO_REPLACE')
-    replacement_string = os.environ.get('REPLACEMENT_STRING')
-    excluded_repos = os.environ.get('EXCLUDED_REPOS', '').split(',')
-    namespace_to_match = os.environ.get('NAME_SPACE', '').split(',')
-    file_exclusions = os.environ.get('FILE_EXCLUSIONS', '').split(',')
-    access_token = os.environ.get('GITHUB_TOKEN')
+    str_to_replace = os.getenv('STR_TO_REPLACE', '-this-one-officer')
+    replacement_string = os.getenv('REPLACEMENT_STRING', 'arrested')
+    excluded_repos = os.getenv('EXCLUDED_REPOS', '').split(',')
+    namespace_to_match = os.getenv('NAME_SPACE', '').split(',')
+    file_exclusions = os.getenv('FILE_EXCLUSIONS', '').split(',')
+    access_token = os.getenv('GITHUB_TOKEN')
 
     g = Github(access_token)
 
