@@ -13,7 +13,7 @@ on:
         default: 'arrested'
       REPOS_TO_CHANGE:
         description: 'Repositories to change (comma-separated)'
-        required: true
+        required: false
         default: ''
       EXCLUDED_REPOS:
         description: 'Repositories to exclude (comma-separated)'
