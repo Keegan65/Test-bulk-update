@@ -2,10 +2,12 @@ from github import Github
 import os
 import yaml
 
-STR_TO_REPLACE = "-this-one-officer"
-REPLACEMENT_STRING = "arrested"
+# Get inputs from environment variables
+STR_TO_REPLACE = os.getenv('STRING_FIND')
+REPLACEMENT_STRING = os.getenv('STRING_REPLACE')
+file_exclusions = os.environ.get('FILE_EXCLUSIONS', '').split(',')
 ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
-NAMESPACE_TO_MATCH = "finance"  # Update with your namespace
+NAMESPACE_TO_MATCH = os.environ.get('NAME_SPACE', '').split(',')
 
 # Initialize the GitHub instance
 g = Github(ACCESS_TOKEN)
@@ -13,6 +15,9 @@ g = Github(ACCESS_TOKEN)
 # Iterate through all repositories owned by the user
 for repo in g.get_user().get_repos(type="owner"):
     print(f"Processing repository: {repo.name}")
+
+    # Fetch all content from the repo's root directory
+    repo_contents = repo.get_contents("")
 
     # Check if the repository has a Deploy.yml file under .github/workflows
     deploy_yml_path = ".github/workflows/Deploy.yml"
@@ -26,16 +31,18 @@ for repo in g.get_user().get_repos(type="owner"):
     # If Deploy.yml exists, parse its contents and compare the namespace
     deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
     argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
-    if argo_app != NAMESPACE_TO_MATCH:
-        print(f"Namespace '{NAMESPACE_TO_MATCH}' does not match, moving to the next repository.")
+    if argo_app not in NAMESPACE_TO_MATCH:
+        print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
         continue  # Move to the next repository
-
-    # Fetch all content from the repo's root directory
-    repo_contents = repo.get_contents("")
 
     # Iterate through each file in the repository
     for file in repo_contents:
         print(f"Processing file: {file.name}")
+
+        # Skip processing excluded files
+        if file.name in file_exclusions:
+            print(f"Skipping {file.name} as it's in the exclusions list.")
+            continue
 
         # Skip processing build.gradle files
         if file.name.lower() == "build.gradle":

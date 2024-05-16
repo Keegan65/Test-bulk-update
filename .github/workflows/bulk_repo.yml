@@ -2,6 +2,28 @@ name: Python Script
 
 on:
   workflow_dispatch:
+    inputs:
+        FileName:
+          description: 'Name of the file(s)'
+
+          required: true
+          default: 'default_filename' # Default value for FileName
+        NameSpace:
+          description: 'Namespace(s)'
+          required: true
+          default: 'default_namespace' # Default value for NameSpace
+        FileExclusions:
+          description: 'File Exclusions (if any)'
+          required: false
+          default: '' # Default value for FileExclusions
+        StringFind:
+          description: 'String to find'
+          required: true
+          default: 'default_string_to_find' # Default value for StringFind
+        StringReplace:
+          description: 'String to replace'
+          required: true
+          default: 'default_string_to_replace' # Default value for StringReplace
 
 jobs:
   run_python_script:
@@ -10,19 +32,21 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'  # Specify the Python version you need
-        
+
     - name: Install dependencies
-      run: pip install -r requirements.txt
-      
-    - name: Install PyYaml
-      run: pip install pyyaml # If you have dependencies, install them from requirements.txt
-      
+      run: pip install -r requirements.txt  # If you have dependencies, install them from requirements.txt
+
     - name: Run Python script
       env:
-        GITHUB_TOKEN: ${{ secrets.BULK_TOKEN }}  # Use the built-in GitHub token secret
+        GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+        FILE_NAME: ${{ github.event.inputs.FileName }}
+        NAME_SPACE: ${{ github.event.inputs.NameSpace }}
+        FILE_EXCLUSIONS: ${{ github.event.inputs.FileExclusions }}
+        STRING_FIND: ${{ github.event.inputs.StringFind }}
+        STRING_REPLACE: ${{ github.event.inputs.StringReplace }}# Use the built-in GitHub token secret
       run: python RepoEdit.py  # Replace with the name of your Python script
