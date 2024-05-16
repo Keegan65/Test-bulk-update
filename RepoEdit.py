@@ -2,7 +2,7 @@ from github import Github
 import os
 import yaml
 
-def process_repository(repo, excluded_repos, namespace_to_match, repos_to_change, file_exclusions, str_to_replace, replacement_string, change_repo_name):
+def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, change_repo_name):
     print(f"Processing repository: {repo.name}")
 
     if repo.name in excluded_repos:
@@ -10,9 +10,6 @@ def process_repository(repo, excluded_repos, namespace_to_match, repos_to_change
         return
 
     if not check_namespace(repo, namespace_to_match):
-        return
-
-    if not check_repos_to_change(repo, repos_to_change):
         return
 
     repo_contents = repo.get_contents("")
@@ -39,18 +36,6 @@ def check_namespace(repo, namespace_to_match):
         print("No deploy YAML content found.")
         return False
 
-def check_repos_to_change(repo, repos_to_change):
-    if not repos_to_change:
-        return True
-
-    if repo.name in repos_to_change:
-        return True
-    else:
-        print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
-        return False
-
-    return True
-
 def get_deploy_yml_file(repo):
     deploy_yml_path = ".github/workflows/Deploy.yml"
     try:
@@ -68,7 +53,6 @@ def get_deploy_yml_content(repo):
 
 def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string, change_repo_name):
     print(f"Processing file: {file.name}")
-    print(f"Change repo name: {change_repo_name}")  # Debugging statement
     try:
         file_content = repo.get_contents(file.path).decoded_content.decode()
         if str_to_replace in file_content:
@@ -77,7 +61,7 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
             print(f"Replaced in {file.name}")
 
             if change_repo_name:
-                print(f"Repo name before change: {repo.name}")  # Debugging statement
+                print(f"Repo name before change: {repo.name}")
                 if str_to_replace in repo.name:
                     new_repo_name = repo.name.replace(str_to_replace, replacement_string)
                     repo.edit(name=new_repo_name)
@@ -88,19 +72,18 @@ def process_file(repo, file, deploy_yml_file, str_to_replace, replacement_string
         print(f"An error occurred while processing {file.name}: {e}")
 
 def main():
-    str_to_replace = os.getenv('STR_TO_REPLACE')
-    replacement_string = os.getenv('REPLACEMENT_STRING')
-    repos_to_change = os.environ.get('REPOS_TO_CHANGE').split(',')
-    excluded_repos = os.environ.get('EXCLUDED_REPOS').split(',')
-    namespace_to_match = os.environ.get('NAME_SPACE').split(',')
+    str_to_replace = os.getenv('STR_TO_REPLACE', '-this-one-officer')
+    replacement_string = os.getenv('REPLACEMENT_STRING', 'arrested')
+    excluded_repos = os.environ.get('EXCLUDED_REPOS', '').split(',')
+    namespace_to_match = os.environ.get('NAME_SPACE', '').split(',')
     file_exclusions = os.environ.get('FILE_EXCLUSIONS', '').split(',')
-    change_repo_name = os.getenv('CHANGE_REPO_NAME').lower() == 'true'
+    change_repo_name = os.getenv('CHANGE_REPO_NAME', 'true').lower() == 'true'
     access_token = os.getenv('GITHUB_TOKEN')
 
     g = Github(access_token)
 
     for repo in g.get_user().get_repos(type="owner"):
-        process_repository(repo, excluded_repos, namespace_to_match, repos_to_change, file_exclusions, str_to_replace, replacement_string, change_repo_name)
+        process_repository(repo, excluded_repos, namespace_to_match, str_to_replace, replacement_string, change_repo_name)
 
 if __name__ == "__main__":
     main()
