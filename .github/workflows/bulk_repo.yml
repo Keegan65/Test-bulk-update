@@ -30,7 +30,7 @@ on:
       CHANGE_REPO_NAME:
         description: 'Change repository name (true/false)'
         required: true
-        default: 'false'
+        default: 'true'
 
 jobs:
   run_python_script:
