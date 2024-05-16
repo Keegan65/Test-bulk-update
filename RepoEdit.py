@@ -10,8 +10,9 @@ def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace,
         print(f"Skipping repository: {repo.name} as it's excluded.")
         return
 
-    if namespace_to_match and not check_namespace(repo, namespace_to_match):
-        return  # Skip if namespace doesn't match
+    if namespace_to_match:
+        if not check_namespace(repo, namespace_to_match):
+            return  # Skip if namespace doesn't match
 
     repo_contents = repo.get_contents("")
     deploy_yml_file = get_deploy_yml_file(repo)
