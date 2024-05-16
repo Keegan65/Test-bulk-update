@@ -3,11 +3,13 @@ import os
 import yaml
 
 # Get inputs from environment variables
-STR_TO_REPLACE = os.getenv('STRING_FIND')
-REPLACEMENT_STRING = os.getenv('STRING_REPLACE')
-file_exclusions = os.environ.get('FILE_EXCLUSIONS', '').split(',')
-ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
+STR_TO_REPLACE = os.getenv('STR_TO_REPLACE', '-this-one-officer')
+REPLACEMENT_STRING = os.getenv('REPLACEMENT_STRING', 'arrested')
+REPOS_TO_CHANGE = os.environ.get('REPOS_TO_CHANGE', '').split(',')
+EXCLUDED_REPOS = os.environ.get('EXCLUDED_REPOS', '').split(',')
 NAMESPACE_TO_MATCH = os.environ.get('NAME_SPACE', '').split(',')
+FILE_EXCLUSIONS = os.environ.get('FILE_EXCLUSIONS', '').split(',')
+ACCESS_TOKEN = os.getenv('GITHUB_TOKEN')
 
 # Initialize the GitHub instance
 g = Github(ACCESS_TOKEN)
@@ -15,6 +17,11 @@ g = Github(ACCESS_TOKEN)
 # Iterate through all repositories owned by the user
 for repo in g.get_user().get_repos(type="owner"):
     print(f"Processing repository: {repo.name}")
+
+    # Check if the repository should be excluded
+    if repo.name in EXCLUDED_REPOS:
+        print(f"Skipping repository: {repo.name} as it's excluded.")
+        continue
 
     # Fetch all content from the repo's root directory
     repo_contents = repo.get_contents("")
@@ -28,25 +35,27 @@ for repo in g.get_user().get_repos(type="owner"):
         print(f"No Deploy.yml found in the repository: {e}")
         continue  # Move to the next repository
 
-    # If Deploy.yml exists, parse its contents and compare the namespace
-    deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
-    argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
-    if argo_app not in NAMESPACE_TO_MATCH:
-        print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
-        continue  # Move to the next repository
+    # If namespaces are provided, check if the repository matches any of them
+    if NAMESPACE_TO_MATCH:
+        # If Deploy.yml exists, parse its contents and compare the namespace
+        deploy_yml_content = yaml.safe_load(deploy_yml_file.decoded_content)
+        argo_app = deploy_yml_content.get("jobs", {}).get("Deploy-To-GKE", {}).get("with", {}).get("ARGO_APP")
+        if argo_app not in NAMESPACE_TO_MATCH:
+            print(f"Namespace '{argo_app}' does not match, moving to the next repository.")
+            continue  # Move to the next repository
+
+    # Process only specific repositories if provided
+    if REPOS_TO_CHANGE and repo.name not in REPOS_TO_CHANGE:
+        print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
+        continue
 
     # Iterate through each file in the repository
     for file in repo_contents:
         print(f"Processing file: {file.name}")
 
         # Skip processing excluded files
-        if file.name in file_exclusions:
+        if file.name in FILE_EXCLUSIONS:
             print(f"Skipping {file.name} as it's in the exclusions list.")
-            continue
-
-        # Skip processing build.gradle files
-        if file.name.lower() == "build.gradle":
-            print("Skipping build.gradle")
             continue
 
         try:
