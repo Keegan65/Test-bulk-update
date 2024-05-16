@@ -16,6 +16,7 @@ def process_repository(repo, excluded_repos, namespace_to_match, str_to_replace,
     deploy_yml_file = get_deploy_yml_file(repo)
 
     for file in repo_contents:
+        print(f"Scanning file: {file.name}")  # Debugging statement
         if file.name in file_exclusions:
             print(f"Skipping {file.name} as it's in the exclusions list.")
             continue
