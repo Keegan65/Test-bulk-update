@@ -42,7 +42,9 @@ def check_repos_to_change(repo, repos_to_change):
     if not repos_to_change:
         return True
 
-    if repo.name not in repos_to_change:
+    if repo.name in repos_to_change:
+        return True
+    else:
         print(f"Skipping repository: {repo.name} as it's not in the specified repositories list.")
         return False
 
